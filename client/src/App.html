@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tasks</title>
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+  </head>
+  <body>
+    <div id="app" class="container">
+      <div class="container m-5 p-2 rounded mx-auto bg-light shadow">
+        <div class="row m-1 p-4">
+          <div class="col">
+            <h1
+              class="p-1 h1 text-primary text-center mx-auto display-inline-block"
+            >
+              My Tasks
+            </h1>
+          </div>
+        </div>
+        <div class="row m-1 p-3">
+          <div class="col col-11 mx-auto">
+            <div
+              class="row bg-white rounded shadow-sm p-2 add-todo-wrapper align-items-center justify-content-center"
+            >
+              <div class="col">
+                <input
+                  class="form-control form-control-lg border-0 add-todo-input bg-transparent rounded"
+                  type="text"
+                  placeholder="Add new task.."
+                  v-model="task"
+                />
+              </div>
+              <div class="col-auto px-0 mx-0 mr-2">
+                <button type="button" class="btn btn-primary" @click="addTasks">
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <transition mode="out-in">
+          <div v-if="message" class="row mx-1 px-5 w-80">
+            <div class="alert col col-12" :class="alertClass" role="alert">
+              {{ message }}
+            </div>
+          </div>
+        </transition>
+        <div class="p-2 mx-4 border-black-25 border-bottom"></div>
+        <div class="row mx-1 px-5 pb-3 w-80">
+          <div class="col mx-auto">
+            <div
+              v-for="task in listTasks"
+              class="row px-3 align-items-center todo-item rounded"
+              :key="task.id"
+            >
+              <div class="col px-1 m-1 d-flex align-items-center">
+                <input
+                  type="text"
+                  class="form-control form-control-lg border-0 edit-todo-input bg-transparent rounded px-3"
+                  :value="task.title"
+                />
+              </div>
+              <div class="col-auto m-1 p-0 px-3">
+                <div class="row">
+                  <div class="col-auto d-flex align-items-center">
+                    <button class="btn btn-danger" @click="deleteTask(task.id)">
+                      Deletar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./assets/js/bootstrap.js"></script>
+    <script src="../vue.js"></script>
+    <script>
+      const vm = new Vue({
+        el: "#app",
+        data: {
+          listTasks: [],
+          task: "",
+          message: "",
+          alertClass: "",
+        },
+        methods: {
+          getTasks() {
+            fetch("http://localhost:3333/tasks")
+              .then((r) => r.json())
+              .then((r) => {
+                this.listTasks = r;
+              });
+          },
+          addTasks() {
+            fetch("http://localhost:3333/tasks", {
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              method: "POST",
+              body: JSON.stringify({ title: this.task }),
+            })
+              .then((r) => r.json())
+              .then((r) => {
+                if (r.error) {
+                  this.message = r.error;
+                  this.alertClass = r.classError;
+                } else {
+                  this.message = "Task successfully added";
+                  this.alertClass = "alert-success";
+                  this.getTasks();
+                }
+              });
+          },
+          deleteTask(id) {
+            fetch(`http://localhost:3333/tasks/delete/${id}`, {
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              method: "DELETE",
+            })
+              .then((r) => r.json())
+              .then((r) => {
+                console.log(r);
+              });
+          },
+        },
+        created() {
+          this.getTasks();
+        },
+      });
+    </script>
+  </body>
+</html>
