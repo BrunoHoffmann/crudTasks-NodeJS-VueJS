@@ -20,15 +20,22 @@ module.exports = {
   },
 
   async update(req, res) {
-    const { id, title } = req.body;
+    const { title } = req.body;
+    const { id } = req.params;
 
-    const task = await Task.findByPk(id);
-    task.title = title;
-    task.save();
-
+    const task = await Task.update(
+      { 
+        title: title
+      },
+      {
+        where: {id}
+      }
+    );
     if (!task) {
       return res.status(400).json({ error: 'Tasks not found' });
     }
+
+    return res.status(200).json({ message: 'task successfully changed'});
   },
 
   async delete(req, res) {

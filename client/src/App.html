@@ -30,6 +30,7 @@
                   type="text"
                   placeholder="Add new task.."
                   v-model="task"
+                  @keyup.enter="addTasks"
                 />
               </div>
               <div class="col-auto px-0 mx-0 mr-2">
@@ -60,6 +61,7 @@
                   type="text"
                   class="form-control form-control-lg border-0 edit-todo-input bg-transparent rounded px-3"
                   :value="task.title"
+                  @keyup.enter="updated(task.id, task.title)"
                 />
               </div>
               <div class="col-auto m-1 p-0 px-3">
@@ -114,6 +116,27 @@
                   this.message = "Task successfully added";
                   this.alertClass = "alert-success";
                   this.task = "";
+                  this.getTasks();
+                }
+              });
+          },
+          updated(id, title) {
+            fetch(`http://localhost:3333/tasks/update/${id}`, {
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              method: "PUT",
+              body: JSON.stringify({ title: title }),
+            })
+              .then((r) => r.json())
+              .then((r) => {
+                if (r.error) {
+                  this.message = r.error;
+                  this.alertClass = r.classError;
+                } else {
+                  this.message = r.message;
+                  this.alertClass = "alert-success";
                   this.getTasks();
                 }
               });
