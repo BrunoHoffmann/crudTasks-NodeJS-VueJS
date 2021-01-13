@@ -11,7 +11,7 @@ module.exports = {
     const { title } = req.body;
     
     if (!title) {
-      return res.status(200).json({ error: 'Tasks not found', classError: 'alert-danger' });
+      return res.status(400).json({ error: 'Task field not filled', classError: 'alert-danger' });
     }
 
     const task = await Task.create({ title });
@@ -22,18 +22,26 @@ module.exports = {
   async update(req, res) {
     const { id, title } = req.body;
 
-    const tasks = await Task.findByPk(id);
-    tasks.title = title;
-    tasks.save();
+    const task = await Task.findByPk(id);
+    task.title = title;
+    task.save();
 
-    if (!tasks) {
+    if (!task) {
       return res.status(400).json({ error: 'Tasks not found' });
     }
   },
 
   async delete(req, res) {
-    const { id } = req.body;
+    const id = req.params.id;
 
-    console.log(id);
+    const task = await Task.findByPk(id);
+
+    if (!task) {
+      return res.status(400).json({ error: 'Tasks not found' });
+    }
+
+    await task.destroy();
+
+    return res.status(200).json({ message: 'Task successfully deleted'});
   }
 };

@@ -5,7 +5,7 @@ const routes = express.Router();
 
 routes.get('/tasks', TaskController.index);
 routes.post('/tasks', TaskController.store);
-routes.post('/tasks/update', TaskController.update);
-routes.delete('/tasks/delete', TaskController.delete);
+routes.post('/tasks/update/:id', TaskController.update);
+routes.delete('/tasks/delete/:id', TaskController.delete);
 
 module.exports = routes;

@@ -113,6 +113,7 @@
                 } else {
                   this.message = "Task successfully added";
                   this.alertClass = "alert-success";
+                  this.task = "";
                   this.getTasks();
                 }
               });
@@ -127,7 +128,14 @@
             })
               .then((r) => r.json())
               .then((r) => {
-                console.log(r);
+                if (r.error) {
+                  this.message = r.error;
+                  this.alertClass = "alert-danger";
+                } else {
+                  this.message = r.message;
+                  this.alertClass = "alert-success";
+                  this.getTasks();
+                }
               });
           },
         },
